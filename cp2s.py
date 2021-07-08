@@ -1,14 +1,20 @@
 from serial import Serial, STOPBITS_ONE, PARITY_NONE, EIGHTBITS
-from requests import post, Timeout
+from requests import post
+from sqlite3 import connect
+from datetime import datetime
 
 webserver_url = "https://"
-data_dump = "cp2s_data.txt"
-with open(data_dump, 'at') as data_file:
-    with Serial('/dev/ttyUSB0', 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, bytesize=EIGHTBITS) as ser:
-        while True:
-            try:
-                line = ser.readline()
-                data_file.write(line.decode().strip() + "\n")
-                post(webserver_url, json={'data': line.decode().strip()})
-            except:  # I don't give a fuck thats its "too broad". Its meant to catch ALL exceptions!
-                pass
+
+con = connect("cp2s_data.sqlite")
+cur = con.cursor()
+
+with Serial('/dev/ttyUSB0', 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, bytesize=EIGHTBITS) as ser:
+    while True:
+        try:
+            line = ser.readline()
+            print(line)
+            cur.execute("INSERT INTO data VALUES (?, ?)", (datetime.now(), line.decode().strip()))
+            con.commit()
+            post(webserver_url, json={'data': line.decode().strip()})
+        except Exception as e:  # I don't give a fuck thats its "too broad". Its meant to catch ALL exceptions!
+            print(e)
