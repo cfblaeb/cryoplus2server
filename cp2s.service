@@ -4,9 +4,9 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/home/pi/spot_ve/bin/python /home/pi/cryoplus2server/cp2s.py
-WorkingDirectory=/home/pi/cryoplus2server
-User=pi
+ExecStart=/home/laeb/venv/bin/python /home/laeb/cryoplus2server/cp2s.py
+WorkingDirectory=/home/laeb/cryoplus2server
+User=laeb
 
 [Install]
 WantedBy=multi-user.target

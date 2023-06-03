@@ -13,7 +13,7 @@ with Serial('/dev/ttyUSB0', 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, byt
     while True:
         try:
             line = ser.readline()
-            print(line)
+            print(line, flush=True)
             cur.execute("INSERT INTO data VALUES (?, ?)", (datetime.now(), line.decode().strip()))
             con.commit()
             res = post(webserver_url, json={'data': line.decode().strip()})
@@ -21,6 +21,6 @@ with Serial('/dev/ttyUSB0', 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, byt
                 f.write(f"{datetime.now()}\t{res.status_code}\t{res.reason}\t{res.text}\n")
 
         except Exception as e:
-            print(e)
+            print(e, flush=True)
             with open(logfile, 'at') as f:
                 f.write(f"{datetime.now()}\tERROR\t{e}\n")
