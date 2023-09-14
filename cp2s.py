@@ -2,15 +2,12 @@ from serial import Serial, STOPBITS_ONE, PARITY_NONE, EIGHTBITS
 from requests import post
 from sqlite3 import connect
 from datetime import datetime
+from config import webserver_url, freezer, logfile, db_name, ser_port
 
-freezer = 0
-webserver_url = "https://"
-logfile = "log.log"
-
-con = connect("cryo_data.sqlite")
+con = connect(db_name)
 cur = con.cursor()
 
-with Serial('/dev/ttyUSB0', 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, bytesize=EIGHTBITS) as ser:
+with Serial(ser_port, 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, bytesize=EIGHTBITS) as ser:
     while True:
         try:
             line = ser.readline()

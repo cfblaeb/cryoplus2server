@@ -1,2 +1,3 @@
 .idea/
-cp2s_data.sqlite
+cryo_data.sqlite
+venv
