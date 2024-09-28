@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/home/laeb/venv/bin/python /home/laeb/cryoplus2server/cp2s.py
+ExecStart=/home/laeb/venv/bin/python /home/laeb/cryoplus2server/mqtt_client.py
 WorkingDirectory=/home/laeb/cryoplus2server
 User=laeb
 

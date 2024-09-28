@@ -1,3 +1,4 @@
 .idea/
 cryo_data.sqlite
 venv
+.python-version
