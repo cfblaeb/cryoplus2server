@@ -6,7 +6,7 @@ logfile = "log.log"
 ser_port = '/dev/ttyUSB0'
 
 # Define the MQTT settings
-MQTT_BROKER = "192.168.0.223"
+MQTT_BROKER = "192.38.14.162"
 MQTT_PORT = 1883
 MQTT_USERNAME = "mqttuser"
 MQTT_PASSWORD = "mqttpass"
