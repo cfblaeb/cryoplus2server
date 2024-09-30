@@ -11,9 +11,9 @@ MQTT_PORT = 1883
 MQTT_USERNAME = "mqttuser"
 MQTT_PASSWORD = "mqttpass"
 MQTT_DISCOVERY_TOPIC = f"homeassistant/sensor/{freezer_short_name}/config"
-MQTT_STATE_TOPIC_TEMP = "home/R917/temperature"
-MQTT_STATE_TOPIC_LL = "home/R917/distance"
-MQTT_STATE_TOPIC_ALARM = "home/R917/enum"
+MQTT_STATE_TOPIC_TEMP = f"home/{freezer_short_name}/temperature"
+MQTT_STATE_TOPIC_LL = f"home/{freezer_short_name}/distance"
+MQTT_STATE_TOPIC_ALARM = f"home/{freezer_short_name}/enum"
 #MQTT_STATE_TOPIC_LOG = "home/R917/..."  # could maybe be done with timestamp...
 
 device_config = {
