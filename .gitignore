@@ -1,5 +1,5 @@
 .idea/
-cryo_data.sqlite
+*.sqlite
 venv
 .venv
 .python-version

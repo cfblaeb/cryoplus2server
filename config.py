@@ -3,7 +3,7 @@ freezer_name = "CryoPlus2" if freezer == 0 else "CBS3000"
 freezer_short_name = "cp2" if freezer == 0 else "cbs3000"
 
 logfile = "log.log"
-ser_port = '/dev/ttyUSB0'
+ser_port = '/dev/ttyUSB1'
 
 # Define the MQTT settings
 MQTT_BROKER = "192.38.14.162"
