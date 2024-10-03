@@ -15,6 +15,11 @@ def on_connect(client, userdata, flags, reason_code, properties):
         print(f"Failed to connect, reason code: {reason_code}")
 
 
+def on_disconnect(client, userdata, reason_code, properties):
+    print(f"Disconnected, reason code: {reason_code}")
+    client.reconnect()
+
+
 def on_message(client, userdata, msg):
     print(f"{msg.topic} {msg.payload}")
 
@@ -24,6 +29,7 @@ client = mqtt.Client(protocol=mqtt.MQTTv5, callback_api_version=mqtt.CallbackAPI
 
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 client.on_connect = on_connect
+client.on_disconnect = on_disconnect
 client.on_message = on_message
 
 # Connect to the MQTT broker
