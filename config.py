@@ -15,11 +15,11 @@ MQTT_BROKER = os.environ["MQTT_BROKER"]
 MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
 MQTT_USERNAME = os.environ["MQTT_USERNAME"]
 MQTT_PASSWORD = os.environ["MQTT_PASSWORD"]
-MQTT_DISCOVERY_TOPIC = f"homeassistant/sensor/{freezer_short_name}/config"
 MQTT_STATE_TOPIC_TEMP = f"home/{freezer_short_name}/temperature"
 MQTT_STATE_TOPIC_LL = f"home/{freezer_short_name}/distance"
-MQTT_STATE_TOPIC_ALARM = f"home/{freezer_short_name}/enum"
-#MQTT_STATE_TOPIC_LOG = "home/R917/..."  # could maybe be done with timestamp...
+MQTT_STATE_TOPIC_ALARM = f"home/{freezer_short_name}/last_alarm"
+MQTT_STATE_TOPIC_ALARM_TIME = f"home/{freezer_short_name}/last_alarm_time"
+MQTT_STATE_TOPIC_ALARM_ACTIVE = f"home/{freezer_short_name}/alarm_active"
 
 device_config = {
     "name": f"LN2 freezer {freezer_name}",
@@ -42,6 +42,7 @@ sensor_configs = [
         "state_topic": MQTT_STATE_TOPIC_TEMP,
         "unit_of_measurement": "°C",
         "device_class": "temperature",
+        "state_class": "measurement",
         "value_template": "{{ value }}",
         "unique_id": f"{freezer_short_name}_temperature_sensor_{freezer}",
         "device": device_config
@@ -51,19 +52,40 @@ sensor_configs = [
         "state_topic": MQTT_STATE_TOPIC_LL,
         "unit_of_measurement": "cm",
         "device_class": "distance",
+        "state_class": "measurement",
         "value_template": "{{ value }}",
         "unique_id": f"{freezer_short_name}_liquid_sensor_{freezer}",
         "device": device_config
     },
     {
-        "name": f"{freezer_name} alarm state",
+        # latest alarm announced by the freezer, as free text
+        # (CryoPlus2: live "FILL ERROR - ..." lines; CBS3000: newest ALARM
+        # event from the daily report)
+        "name": f"{freezer_name} last alarm",
         "state_topic": MQTT_STATE_TOPIC_ALARM,
-        "device_class": "enum",
-        "attributes": {
-            "options": ["FILL_ERROR_ALARM", "HIGH_TEMP_ALARM", "NO_ALARM"]
-        },
+        "icon": "mdi:alert-circle-outline",
         "value_template": "{{ value }}",
-        "unique_id": f"{freezer_short_name}_alarm_state_{freezer}",
+        "unique_id": f"{freezer_short_name}_last_alarm_{freezer}",
+        "device": device_config
+    },
+    {
+        "name": f"{freezer_name} last alarm time",
+        "state_topic": MQTT_STATE_TOPIC_ALARM_TIME,
+        "device_class": "timestamp",
+        "value_template": "{{ value }}",
+        "unique_id": f"{freezer_short_name}_last_alarm_time_{freezer}",
         "device": device_config
     },
 ]
+
+if freezer == 1:
+    # only the CBS3000 reports alarm corrections, so only there can we tell
+    # whether an alarm is still active (recomputed from each daily report)
+    sensor_configs.append({
+        "component": "binary_sensor",
+        "name": f"{freezer_name} alarm active",
+        "state_topic": MQTT_STATE_TOPIC_ALARM_ACTIVE,
+        "device_class": "problem",
+        "unique_id": f"{freezer_short_name}_alarm_active_{freezer}",
+        "device": device_config
+    })
