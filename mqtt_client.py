@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 import json
-from serial import Serial, STOPBITS_ONE, PARITY_NONE, EIGHTBITS
+from serial import Serial, SerialException, STOPBITS_ONE, PARITY_NONE, EIGHTBITS
 from datetime import datetime
 from config import *
 
@@ -8,16 +8,16 @@ from config import *
 # Define the callback functions
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
-        print("Connected successfully")
+        print("Connected successfully", flush=True)
         for config in sensor_configs:
             client.publish(f"homeassistant/sensor/{config['unique_id']}/config", json.dumps(config), retain=True)
     else:
-        print(f"Failed to connect, reason code: {reason_code}")
+        print(f"Failed to connect, reason code: {reason_code}", flush=True)
 
 
-def on_disconnect(client, userdata, reason_code, properties):
-    print(f"Disconnected, reason code: {reason_code}")
-    client.reconnect()
+def on_disconnect(client, userdata, flags, reason_code, properties):
+    # paho's network loop reconnects on its own (see reconnect_delay_set below)
+    print(f"Disconnected, reason code: {reason_code}", flush=True)
 
 
 def on_message(client, userdata, msg):
@@ -32,8 +32,11 @@ client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.on_message = on_message
 
-# Connect to the MQTT broker
-client.connect(MQTT_BROKER, MQTT_PORT, 60)
+# Connect to the MQTT broker.
+# connect_async + loop_start keeps retrying (1s-2min backoff) if the broker is
+# unreachable, both at startup (e.g. network not up yet) and after a dropout.
+client.reconnect_delay_set(min_delay=1, max_delay=120)
+client.connect_async(MQTT_BROKER, MQTT_PORT, 60)
 client.loop_start()
 
 
@@ -87,6 +90,8 @@ with Serial(ser_port, 9600, stopbits=STOPBITS_ONE, parity=PARITY_NONE, bytesize=
             with open(logfile, 'at') as f:
                 f.write(f"{datetime.now()}\t{data}\n")
 
+        except SerialException:
+            raise  # dead serial port: exit and let systemd restart the service
         except Exception as e:
             print(e, flush=True)
             with open(logfile, 'at') as f:

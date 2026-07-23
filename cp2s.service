@@ -1,12 +1,17 @@
 [Unit]
-Description=cryoplus 2 datalogger
-After=multi-user.target
+Description=LN2 freezer datalogger
+After=network-online.target dev-ttyUSB0.device
+Wants=network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=idle
-ExecStart=/home/laeb/venv/bin/python /home/laeb/cryoplus2server/mqtt_client.py
-WorkingDirectory=/home/laeb/cryoplus2server
-User=laeb
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/pi/cryoplus2server/venv/bin/python /home/pi/cryoplus2server/mqtt_client.py
+WorkingDirectory=/home/pi/cryoplus2server
+User=pi
+Restart=always
+RestartSec=30
 
 [Install]
 WantedBy=multi-user.target

@@ -1,15 +1,20 @@
-freezer = 0
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # local settings and secrets live in .env (see .env.example)
+
+freezer = int(os.environ["FREEZER"])  # 0 = CryoPlus 2, 1 = CBS3000
 freezer_name = "CryoPlus2" if freezer == 0 else "CBS3000"
 freezer_short_name = "cp2" if freezer == 0 else "cbs3000"
 
-logfile = "log.log"
-ser_port = '/dev/ttyUSB1'
+logfile = os.environ.get("LOGFILE", "log.log")
+ser_port = os.environ.get("SERIAL_PORT", "/dev/ttyUSB0")
 
 # Define the MQTT settings
-MQTT_BROKER = "192.38.14.162"
-MQTT_PORT = 1883
-MQTT_USERNAME = "mqttuser"
-MQTT_PASSWORD = "mqttpass"
+MQTT_BROKER = os.environ["MQTT_BROKER"]
+MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
+MQTT_USERNAME = os.environ["MQTT_USERNAME"]
+MQTT_PASSWORD = os.environ["MQTT_PASSWORD"]
 MQTT_DISCOVERY_TOPIC = f"homeassistant/sensor/{freezer_short_name}/config"
 MQTT_STATE_TOPIC_TEMP = f"home/{freezer_short_name}/temperature"
 MQTT_STATE_TOPIC_LL = f"home/{freezer_short_name}/distance"
